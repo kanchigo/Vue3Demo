@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://unpkg.com/vue@next"></script>
+</head>
+
+<body>
+  <div id="Application">
+    <!-- 游戏区域 -->
+    <div class="container">
+      <!-- 挡板 -->
+      <div class="board" :style="{left:boardX + 'px'}"></div>
+      <!-- 小球 -->
+      <div class="ball" :style="{left:ballX + 'px', top:ballY + 'px'}"></div>
+      <!-- 失败提示 -->
+      <h1 v-if="fail" style="text-align: center">游戏失败</h1>
+    </div>
+  </div>
+</body>
+
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    position: relative;
+    margin: 0 auto;
+    width: 500px;
+    height: 500px;
+    background-color: blanchedalmond;
+  }
+
+  .ball {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    left: 0px;
+    top: 0px;
+    background-color: orange;
+    border-radius: 30px;
+  }
+
+  .board {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 10px;
+    width: 80px;
+    border-radius: 5px;
+    background-color: orangered;
+  }
+</style>
+
+<script>
+  const App = {
+    data() {
+      return {
+        // 挡板位置
+        boardX: 0,
+        //弹球位置
+        ballX: 0,
+        ballY: 0,
+        // 弹球速度
+        rateX: 0.1,
+        rateY: 0.1,
+        //控制游戏结束
+        fail: false
+      }
+    },
+
+    mounted() {
+      this.enterKeyup()
+      //随机弹球的运动速度和方向
+      this.rateX = (Math.random() + 0.1)
+      this.rateY = (Math.random() + 0.1)
+      //开启计数器，弹球移动
+      this.timer = setInterval(() => {
+        //到达右侧边缘后反弹
+        if (this.ballX + this.rateX >= 500 - 30) {
+          this.rateX *= -1
+        }
+        //到达左侧边缘后反弹
+        if (this.ballX + this.rateX <= 0) {
+          this.rateX *= -1
+        }
+        //到达上侧边缘后反弹
+        if (this.ballY + this.rateY <= 0) {
+          this.rateY *= -1
+        }
+        this.ballX += this.rateX
+        this.ballY += this.rateY
+        //到达下侧时判断挡板是否接住
+        if (this.ballY >= 500 - 30 - 10) {
+          //挡板接住后反弹
+          if (this.boardX <= this.ballX + 30 && this.boardX + 80 >= this.ballX) {
+            this.rateY *= -1
+          } else {
+            //没接住则游戏失败
+            clearInterval(this.timer)
+            this.fail = true
+          }
+        }
+      }, 2);
+    },
+
+    methods: {
+      //控制挡板移动
+      keydown(event) {
+        if (event.keyCode === 37) {
+          if (this.boardX > 10) {
+            this.boardX -= 20
+          }
+        } else if (event.keyCode === 39) {
+          if (this.boardX < 500 - 80) {
+            this.boardX += 20
+          }
+        }
+      },
+      enterKeyup() {
+        document.addEventListener("keydown", this.keydown)
+      }
+    },
+  }
+  Vue.createApp(App).mount("#Application")
+</script>
+
+</html>
