@@ -30,3 +30,7 @@
 ### UserList
 用户列表。
 两种实现方式，其中更推荐组合式。
+
+
+### StudentList
+教务系统学生列表，基于Vue和ElementPlus
